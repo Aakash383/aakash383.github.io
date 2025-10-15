@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aakash Sivashanmugam // Cybernetic Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f2ea; /* Cyan/Green */
+            --secondary-color: #ff00f2; /* Pink/Magenta */
+            --background-color: #0d0d1a;
+            --text-color: #e0e0e0;
+            --card-bg: rgba(10, 10, 25, 0.6);
+        }
+
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .cyber-glow {
+            text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
+        }
+
+        .cyber-glow-secondary {
+            text-shadow: 0 0 5px var(--secondary-color), 0 0 10px var(--secondary-color);
+        }
+
+        .cyber-card {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 242, 234, 0.1);
+        }
+
+        .cyber-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 242, 234, 0.3);
+            border-color: var(--secondary-color);
+        }
+        
+        .cyber-button {
+            font-family: 'Orbitron', sans-serif;
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .cyber-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .cyber-button:hover {
+            color: var(--background-color);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        
+        .cyber-button:hover::before {
+            left: 100%;
+        }
+
+        .hero-glitch-effect {
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-glitch-effect::before,
+        .hero-glitch-effect::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            overflow: hidden;
+        }
+
+        .hero-glitch-effect::before {
+            left: 2px;
+            text-shadow: -1px 0 var(--secondary-color);
+            animation: text-glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .hero-glitch-effect::after {
+            left: -2px;
+            text-shadow: -1px 0 var(--primary-color);
+            animation: text-glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+        
+        /* --- CORRECTED COMBINED GLITCH EFFECT --- */
+        .image-glitch-container {
+            position: relative;
+            width: 192px; /* w-48 */
+            height: 192px; /* h-48 */
+            border-radius: 9999px; /* rounded-full */
+            overflow: hidden;
+            /* Set the main image as the background of the container */
+            background-image: url('aakash.jpg'); 
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .image-glitch-container > img {
+            /* Hide the original image tag, it's just for semantics now */
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .image-glitch-container::before,
+        .image-glitch-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 9999px;
+            background-size: cover;
+            background-position: center;
+            /* Both pseudo-elements also get the image */
+            background-image: url('aakash.jpg'); 
+        }
+
+        .image-glitch-container::before {
+            /* This layer is tinted cyan */
+            background-color: var(--primary-color);
+            background-blend-mode: multiply;
+            animation: combined-glitch-1 2.5s infinite linear;
+        }
+
+        .image-glitch-container::after {
+            /* This layer is tinted magenta */
+            background-color: var(--secondary-color);
+            background-blend-mode: multiply;
+            animation: combined-glitch-2 2s infinite linear;
+        }
+        
+        @keyframes combined-glitch-1 {
+            0%, 20%, 100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+            22% { transform: translate(-5px, 3px); clip-path: inset(10% 0 85% 0); }
+            24% { transform: translate(4px, -5px); }
+            26% { transform: translate(-3px, 2px); clip-path: inset(90% 0 2% 0); }
+            28% { transform: translate(0, 0); }
+            60% { transform: translate(5px, -2px); clip-path: inset(20% 0 70% 0); }
+            62% { transform: translate(-4px, 5px); }
+            64% { transform: translate(3px, -3px); clip-path: inset(50% 0 40% 0); }
+            66% { transform: translate(0, 0); }
+        }
+
+        @keyframes combined-glitch-2 {
+            0%, 35%, 100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+            37% { transform: translate(4px, -6px); clip-path: inset(75% 0 5% 0); }
+            39% { transform: translate(-5px, 5px); }
+            41% { transform: translate(2px, -2px); clip-path: inset(0 0 95% 0); }
+            43% { transform: translate(0, 0); }
+            80% { transform: translate(-4px, 6px); clip-path: inset(90% 0 1% 0); }
+            82% { transform: translate(5px, -4px); }
+            84% { transform: translate(-2px, 3px); clip-path: inset(30% 0 60% 0); }
+            86% { transform: translate(0, 0); }
+        }
+        /* --- END NEW EFFECT --- */
+
+        @keyframes text-glitch-anim-1 {
+            0% { clip: rect(44px, 9999px, 46px, 0); }
+            5% { clip: rect(32px, 9999px, 83px, 0); }
+            10% { clip: rect(45px, 9999px, 73px, 0); }
+            100% { clip: rect(25px, 9999px, 78px, 0); }
+        }
+
+        @keyframes text-glitch-anim-2 {
+            0% { clip: rect(52px, 9999px, 12px, 0); }
+            100% { clip: rect(62px, 9999px, 91px, 0); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--background-color); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary-color); }
+    </style>
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="relative min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="max-w-6xl mx-auto">
+            
+            <!-- Header -->
+            <header class="flex justify-between items-center py-4 relative z-50">
+                <a href="#" class="font-orbitron text-xl sm:text-2xl font-bold cyber-glow">AAKASH SIVASHANMUGAM</a>
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#about" class="hover:text-primary-color transition-colors">/about</a>
+                    <a href="#interests" class="hover:text-primary-color transition-colors">/skills</a>
+                    <a href="#projects" class="hover:text-primary-color transition-colors">/projects</a>
+                    <a href="#contact" class="hover:text-primary-color transition-colors">/contact</a>
+                </nav>
+                 <!-- Mobile Nav Button -->
+                <button id="menu-btn" class="md:hidden focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-background-color/95 backdrop-blur-sm z-40">
+                <div class="flex flex-col items-center justify-center h-full space-y-8">
+                    <a href="#about" class="mobile-menu-link font-orbitron text-3xl hover:text-primary-color transition-colors">/about</a>
+                    <a href="#interests" class="mobile-menu-link font-orbitron text-3xl hover:text-primary-color transition-colors">/skills</a>
+                    <a href="#projects" class="mobile-menu-link font-orbitron text-3xl hover:text-primary-color transition-colors">/projects</a>
+                    <a href="#contact" class="mobile-menu-link font-orbitron text-3xl hover:text-primary-color transition-colors">/contact</a>
+                </div>
+            </div>
+
+            <!-- Hero Section -->
+            <section class="min-h-[calc(100vh-88px)] flex flex-col items-center justify-center text-center py-20">
+                <h1 class="font-orbitron text-4xl sm:text-6xl lg:text-7xl font-bold mb-4">
+                    <span class="hero-glitch-effect" data-text="INITIATING_CONNECTION">INITIATING_CONNECTION</span>
+                </h1>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">
+                   A results-oriented <span class="text-primary-color font-semibold">Cybersecurity Graduate Student</span> with hands-on experience in building <span class="text-secondary-color font-semibold">AI-driven security tools</span>.
+                </p>
+                <div class="mt-8">
+                    <a href="#projects" class="cyber-button">View My Work</a>
+                </div>
+            </section>
+
+            <!-- About Me -->
+            <section id="about" class="py-16">
+                <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">01 // ABOUT_ME</h2>
+                <div class="cyber-card p-8 md:p-12">
+                    <div class="grid md:grid-cols-3 gap-8 items-center">
+                        <div class="md:col-span-1 flex justify-center">
+                            <!-- Image with Glitch Effect -->
+                            <div class="image-glitch-container border-4 border-primary-color">
+                                <!-- IMPORTANT: Replace this src with your image! -->
+                                <img src="aakash.jpg" alt="Aakash Sivashanmugam">
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h3 class="font-orbitron text-2xl font-bold text-primary-color mb-4">Welcome to my digital nexus.</h3>
+                            <p class="mb-4">
+                                I'm Aakash Sivashanmugam, a passionate cybersecurity student currently pursuing my Master's at the University of Michigan-Dearborn. My journey is driven by a fascination with threat analysis, network security, and proactive defense.
+                            </p>
+                            <p>
+                                I specialize in developing AI-driven security tools and possess a strong foundation in both offensive and defensive cyber strategies. This space serves as a portfolio of my projects and a log of my explorations into the ever-evolving world of cybersecurity.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Skills -->
+            <section id="interests" class="py-16">
+                <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">02 // SKILLS_MATRIX</h2>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Skill 1 -->
+                    <div class="cyber-card p-6 text-center">
+                        <div class="text-5xl mb-4 text-primary-color">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        </div>
+                        <h3 class="font-orbitron text-xl font-bold mb-2">Cybersecurity</h3>
+                        <p class="text-sm">Nmap, Wireshark, Metasploit, Burp Suite, and Proactive Defense.</p>
+                    </div>
+                    <!-- Skill 2 -->
+                    <div class="cyber-card p-6 text-center">
+                        <div class="text-5xl mb-4 text-primary-color">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M12 6V4m0 16v-2M8 8l1.88 1.88M14.12 14.12 16 16M8 16l1.88-1.88M14.12 9.88 16 8M12 14a2 2 0 100-4 2 2 0 000 4z"/></svg>
+                        </div>
+                        <h3 class="font-orbitron text-xl font-bold mb-2">AI & Machine Learning</h3>
+                        <p class="text-sm">Developing AI-driven systems and phishing detection models.</p>
+                    </div>
+                    <!-- Skill 3 -->
+                    <div class="cyber-card p-6 text-center">
+                        <div class="text-5xl mb-4 text-primary-color">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        </div>
+                        <h3 class="font-orbitron text-xl font-bold mb-2">Full-Stack Dev</h3>
+                        <p class="text-sm">Python, JavaScript, Flutter, Dart, HTML/CSS.</p>
+                    </div>
+                     <!-- Skill 4 -->
+                    <div class="cyber-card p-6 text-center">
+                        <div class="text-5xl mb-4 text-primary-color">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </div>
+                        <h3 class="font-orbitron text-xl font-bold mb-2">UI/UX Design</h3>
+                        <p class="text-sm">Experience with Figma, Adobe XD, and Sketch.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects -->
+            <section id="projects" class="py-16">
+                <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">03 // PROJECTS</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Project 1 -->
+                    <div class="cyber-card overflow-hidden">
+                        <img src="https://placehold.co/600x400/0d0d1a/00f2ea?text=Nemesis+Engine" alt="Nemesis Advance Deception Engine" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="font-orbitron text-2xl font-bold mb-2">Nemesis Advance Deception Engine</h3>
+                            <p class="mb-4">An AI-driven honeypot system that dynamically adapts to attacker behavior, enhancing intrusion detection and proactive defense strategies.</p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="https://github.com/Aakash383" target="_blank" class="cyber-button text-sm">Source Code</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Project 2 -->
+                    <div class="cyber-card overflow-hidden">
+                        <img src="https://placehold.co/600x400/0d0d1a/ff00f2?text=Phishing+Detection" alt="Phishing Website Detection" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="font-orbitron text-2xl font-bold mb-2">Phishing Website Detection</h3>
+                            <p class="mb-4">A machine learning model that identifies phishing websites using URL and content-based features, achieving high accuracy in classification.</p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="https://github.com/Aakash383" target="_blank" class="cyber-button text-sm">Source Code</a>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- Project 3 -->
+                    <div class="cyber-card overflow-hidden">
+                        <img src="https://placehold.co/600x400/0d0d1a/00f2ea?text=Project+Repo" alt="Student Project Repository" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="font-orbitron text-2xl font-bold mb-2">Student Project Repository</h3>
+                            <p class="mb-4">A web application designed to track and manage student projects, officially reviewed and approved by the institution's CEO.</p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="https://github.com/Aakash383" target="_blank" class="cyber-button text-sm">Source Code</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Project 4 -->
+                    <div class="cyber-card overflow-hidden">
+                        <img src="https://placehold.co/600x400/0d0d1a/ff00f2?text=Transport+App" alt="Transport Resource Management" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="font-orbitron text-2xl font-bold mb-2">Transport Resource Management</h3>
+                            <p class="mb-4">A cross-platform mobile app built with Flutter to provide real-time tracking of bus arrival and departure times.</p>
+                            <div class="flex flex-wrap gap-4">
+                               <a href="https://github.com/Aakash383" target="_blank" class="cyber-button text-sm">Source Code</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact -->
+            <section id="contact" class="py-16">
+                 <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">04 // CONTACT</h2>
+                 <div class="cyber-card p-8 md:p-12 max-w-2xl mx-auto">
+                    <p class="text-center mb-8">Have a project in mind, a question, or just want to connect? My inbox is always open. Feel free to send a message or reach out via my social channels.</p>
+                    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                        <div class="mb-4">
+                            <input type="text" name="name" placeholder="Name" class="w-full bg-gray-900 border border-primary-color rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-secondary-color transition-all" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="email" name="email" placeholder="Email" class="w-full bg-gray-900 border border-primary-color rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-secondary-color transition-all" required>
+                        </div>
+                        <div class="mb-6">
+                            <textarea name="message" rows="5" placeholder="Message" class="w-full bg-gray-900 border border-primary-color rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-secondary-color transition-all" required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="cyber-button">Send Message</button>
+                        </div>
+                    </form>
+                 </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="text-center py-8 border-t border-t-primary-color/20 text-gray-400">
+                <div class="flex justify-center space-x-6 mb-4">
+                    <a href="https://github.com/Aakash383" target="_blank" class="hover:text-primary-color transition-colors">GitHub</a>
+                    <a href="https://linkedin.com/in/aakash-siva/" target="_blank" class="hover:text-primary-color transition-colors">LinkedIn</a>
+                    <a href="mailto:aakashsiva383@gmail.com" class="hover:text-primary-color transition-colors">Email</a>
+                </div>
+                <p>&copy; 2025 Aakash Sivashanmugam. All rights reserved.</p>
+            </footer>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Mobile Menu Toggle ---
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // --- Three.js background animation ---
+        let scene, camera, renderer, stars;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.z = 1;
+
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.querySelector('#bg-canvas'),
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 6000;
+            const posArray = new Float32Array(starCount * 3);
+            for(let i = 0; i < starCount * 3; i++) {
+                // Assign positions randomly
+                posArray[i] = (Math.random() - 0.5) * (Math.random() * 5) * 100;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            let starMaterial = new THREE.PointsMaterial({
+                color: 0x00f2ea,
+                size: 0.2,
+                transparent: true,
+                opacity: 0.8,
+            });
+
+            stars = new THREE.Points(starGeo, starMaterial);
+            scene.add(stars);
+
+            window.addEventListener('resize', onWindowResize, false);
+            document.addEventListener('mousemove', onMouseMove, false);
+
+            animate();
+        }
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        function onMouseMove(event) {
+            mouseX = event.clientX - window.innerWidth / 2;
+            mouseY = event.clientY - window.innerHeight / 2;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Animate stars based on mouse movement for a parallax effect
+            camera.position.x += (mouseX * 0.0001 - camera.position.x) * 0.02;
+            camera.position.y += (-mouseY * 0.0001 - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
+
+            stars.rotation.z -= 0.0001;
+            
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
