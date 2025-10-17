@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aakash Sivashanmugam Portfolio</title>
+    <title>Aakash Sivashanmugam // Cybernetic Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,6 +20,7 @@
 
         html {
             overflow-y: scroll;
+            scroll-behavior: smooth; /* Enables smooth scrolling */
         }
 
         body {
@@ -131,21 +132,18 @@
             animation: text-glitch-anim-2 2s infinite linear alternate-reverse;
         }
         
-        /* --- CORRECTED COMBINED GLITCH EFFECT --- */
         .image-glitch-container {
             position: relative;
-            width: 192px; /* w-48 */
-            height: 192px; /* h-48 */
-            border-radius: 9999px; /* rounded-full */
+            width: 192px;
+            height: 192px;
+            border-radius: 9999px;
             overflow: hidden;
-            /* Set the main image as the background of the container */
             background-image: url('aakash.jpg'); 
             background-size: cover;
             background-position: center;
         }
         
         .image-glitch-container > img {
-            /* Hide the original image tag, it's just for semantics now */
             opacity: 0;
             width: 100%;
             height: 100%;
@@ -162,19 +160,16 @@
             border-radius: 9999px;
             background-size: cover;
             background-position: center;
-            /* Both pseudo-elements also get the image */
             background-image: url('aakash.jpg'); 
         }
 
         .image-glitch-container::before {
-            /* This layer is tinted cyan */
             background-color: var(--primary-color);
             background-blend-mode: multiply;
             animation: combined-glitch-1 2.5s infinite linear;
         }
 
         .image-glitch-container::after {
-            /* This layer is tinted magenta */
             background-color: var(--secondary-color);
             background-blend-mode: multiply;
             animation: combined-glitch-2 2s infinite linear;
@@ -203,7 +198,6 @@
             84% { transform: translate(-2px, 3px); clip-path: inset(30% 0 60% 0); }
             86% { transform: translate(0, 0); }
         }
-        /* --- END NEW EFFECT --- */
 
         @keyframes text-glitch-anim-1 {
             0% { clip: rect(44px, 9999px, 46px, 0); }
@@ -216,8 +210,91 @@
             0% { clip: rect(52px, 9999px, 12px, 0); }
             100% { clip: rect(62px, 9999px, 91px, 0); }
         }
+        
+        /* --- NEW: IMPROVED Glitch Scroll Effect --- */
+        #glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--background-color);
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            display: none;
+            overflow: hidden;
+        }
 
-        /* Custom scrollbar */
+        #glitch-overlay.active {
+            display: block;
+            animation: glitch-overlay-fade 0.6s linear forwards;
+        }
+
+        #glitch-overlay::before,
+        #glitch-overlay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+        }
+
+        #glitch-overlay::before {
+            animation: glitch-blocks 0.6s steps(1, end) forwards;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--primary-color) 0px,
+                var(--primary-color) 1px,
+                transparent 1px,
+                transparent 10px
+            );
+        }
+
+        #glitch-overlay::after {
+            animation: glitch-color-shift 0.6s steps(2, end) forwards;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(255, 0, 242, 0.5) 0px,
+                rgba(255, 0, 242, 0.5) 1px,
+                transparent 1px,
+                transparent 5px
+            );
+            mix-blend-mode: screen;
+        }
+
+        @keyframes glitch-overlay-fade {
+            0% { opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes glitch-blocks {
+            0% { transform: translateY(0); }
+            10% { transform: translateY(-2%); clip-path: inset(20% 0 70% 0); }
+            20% { transform: translateY(3%); }
+            30% { transform: translateY(-5%); clip-path: inset(90% 0 2% 0); }
+            40% { transform: translateY(1%); }
+            50% { transform: translateY(-3%); clip-path: inset(40% 0 45% 0); }
+            60% { transform: translateY(4%); }
+            70% { transform: translateY(-1%); }
+            80% { transform: translateY(2%); clip-path: inset(70% 0 15% 0); }
+            90% { transform: translateY(0); clip-path: inset(0 0 0 0); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes glitch-color-shift {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(20px); }
+            50% { transform: translateX(-20px); }
+            75% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+        /* --- END Glitch Scroll --- */
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--background-color); }
         ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
@@ -230,17 +307,14 @@
     <div class="relative min-h-screen p-4 sm:p-6 lg:p-8">
         <div class="max-w-6xl mx-auto">
             
-            <!-- Header -->
             <header class="flex justify-between items-center py-4 relative z-50">
                 <a href="#" class="font-orbitron text-xl sm:text-2xl font-bold cyber-glow">AAKASH SIVASHANMUGAM</a>
-                <!-- Desktop Nav -->
                 <nav class="hidden md:flex space-x-8">
                     <a href="#about" class="hover:text-primary-color transition-colors">about</a>
                     <a href="#interests" class="hover:text-primary-color transition-colors">skills</a>
                     <a href="#projects" class="hover:text-primary-color transition-colors">projects</a>
-                    <a href="#contact" class="hover:text-primary-color transition-colors">contact</a>
+                    <a href="#contact" class="hover:text-primary-color transition-colors">/contact</a>
                 </nav>
-                 <!-- Mobile Nav Button -->
                 <button id="menu-btn" class="md:hidden focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
@@ -248,7 +322,6 @@
                 </button>
             </header>
 
-            <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-background-color/95 backdrop-blur-sm z-40">
                 <div class="flex flex-col items-center justify-center h-full space-y-8">
                     <a href="#about" class="mobile-menu-link font-orbitron text-3xl hover:text-primary-color transition-colors">about</a>
@@ -258,10 +331,9 @@
                 </div>
             </div>
 
-            <!-- Hero Section -->
             <section class="min-h-[calc(100vh-88px)] flex flex-col items-center justify-center text-center py-20">
-                <h1 class="font-orbitron text-4xl sm:text-6xl lg:text-7xl font-bold mb-4">
-                    <span class="hero-glitch-effect" data-text="INITIATING_CONNECTION">INITIATING_CONNECTION</span>
+                <h1 class="font-orbitron text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4">
+                    <span class="hero-glitch-effect" data-text="INITIATING_CONNECTION">INITIATING_<wbr>CONNECTION</span>
                 </h1>
                 <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">
                    A results-oriented <span class="text-primary-color font-semibold">Cybersecurity Graduate Student</span> with hands-on experience in building <span class="text-secondary-color font-semibold">AI-driven security tools</span>.
@@ -271,16 +343,13 @@
                 </div>
             </section>
 
-            <!-- About Me -->
             <section id="about" class="py-16">
                 <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">01 // ABOUT_ME</h2>
                 <div class="cyber-card p-8 md:p-12">
                     <div class="grid md:grid-cols-3 gap-8 items-center">
                         <div class="md:col-span-1 flex justify-center">
-                            <!-- Image with Glitch Effect -->
                             <div class="image-glitch-container border-4 border-primary-color">
-                                <!-- IMPORTANT: Replace this src with your image! -->
-                                <img src="aakash.jpg" alt="Aakash Sivashanmugam">
+                                <img src="https://placehold.co/192x192/0d0d1a/FFFFFF?text=Aakash" alt="Aakash Sivashanmugam">
                             </div>
                         </div>
                         <div class="md:col-span-2">
@@ -296,11 +365,9 @@
                 </div>
             </section>
             
-            <!-- Skills -->
             <section id="interests" class="py-16">
                 <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">02 // SKILLS_MATRIX</h2>
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Skill 1 -->
                     <div class="cyber-card p-6 text-center">
                         <div class="text-5xl mb-4 text-primary-color">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
@@ -308,7 +375,6 @@
                         <h3 class="font-orbitron text-xl font-bold mb-2">Cybersecurity</h3>
                         <p class="text-sm">Nmap, Wireshark, Metasploit, Burp Suite, and Proactive Defense.</p>
                     </div>
-                    <!-- Skill 2 -->
                     <div class="cyber-card p-6 text-center">
                         <div class="text-5xl mb-4 text-primary-color">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M12 6V4m0 16v-2M8 8l1.88 1.88M14.12 14.12 16 16M8 16l1.88-1.88M14.12 9.88 16 8M12 14a2 2 0 100-4 2 2 0 000 4z"/></svg>
@@ -316,7 +382,6 @@
                         <h3 class="font-orbitron text-xl font-bold mb-2">AI & Machine Learning</h3>
                         <p class="text-sm">Developing AI-driven systems and phishing detection models.</p>
                     </div>
-                    <!-- Skill 3 -->
                     <div class="cyber-card p-6 text-center">
                         <div class="text-5xl mb-4 text-primary-color">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
@@ -324,7 +389,6 @@
                         <h3 class="font-orbitron text-xl font-bold mb-2">Full-Stack Dev</h3>
                         <p class="text-sm">Python, JavaScript, Flutter, Dart, HTML/CSS.</p>
                     </div>
-                     <!-- Skill 4 -->
                     <div class="cyber-card p-6 text-center">
                         <div class="text-5xl mb-4 text-primary-color">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -335,11 +399,9 @@
                 </div>
             </section>
 
-            <!-- Projects -->
             <section id="projects" class="py-16">
                 <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">03 // PROJECTS</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Project 1 -->
                     <div class="cyber-card overflow-hidden">
                         <img src="https://placehold.co/600x400/0d0d1a/00f2ea?text=Nemesis+Engine" alt="Nemesis Advance Deception Engine" class="w-full h-56 object-cover">
                         <div class="p-6">
@@ -350,7 +412,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Project 2 -->
                     <div class="cyber-card overflow-hidden">
                         <img src="https://placehold.co/600x400/0d0d1a/ff00f2?text=Phishing+Detection" alt="Phishing Website Detection" class="w-full h-56 object-cover">
                         <div class="p-6">
@@ -361,7 +422,6 @@
                             </div>
                         </div>
                     </div>
-                     <!-- Project 3 -->
                     <div class="cyber-card overflow-hidden">
                         <img src="https://placehold.co/600x400/0d0d1a/00f2ea?text=Project+Repo" alt="Student Project Repository" class="w-full h-56 object-cover">
                         <div class="p-6">
@@ -372,7 +432,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Project 4 -->
                     <div class="cyber-card overflow-hidden">
                         <img src="https://placehold.co/600x400/0d0d1a/ff00f2?text=Transport+App" alt="Transport Resource Management" class="w-full h-56 object-cover">
                         <div class="p-6">
@@ -386,7 +445,6 @@
                 </div>
             </section>
 
-            <!-- Contact -->
             <section id="contact" class="py-16">
                  <h2 class="font-orbitron text-4xl font-bold text-center mb-12 cyber-glow">04 // CONTACT</h2>
                  <div class="cyber-card p-8 md:p-12 max-w-2xl mx-auto">
@@ -408,7 +466,6 @@
                  </div>
             </section>
 
-            <!-- Footer -->
             <footer class="text-center py-8 border-t border-t-primary-color/20 text-gray-400">
                 <div class="flex justify-center space-x-6 mb-4">
                     <a href="https://github.com/Aakash383" target="_blank" class="hover:text-primary-color transition-colors">GitHub</a>
@@ -455,7 +512,6 @@
             const starCount = 6000;
             const posArray = new Float32Array(starCount * 3);
             for(let i = 0; i < starCount * 3; i++) {
-                // Assign positions randomly
                 posArray[i] = (Math.random() - 0.5) * (Math.random() * 5) * 100;
             }
             starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -493,23 +549,43 @@
 
         function animate() {
             requestAnimationFrame(animate);
-
-            // Animate stars based on mouse movement for a parallax effect
             camera.position.x += (mouseX * 0.0001 - camera.position.x) * 0.02;
             camera.position.y += (-mouseY * 0.0001 - camera.position.y) * 0.02;
             camera.lookAt(scene.position);
-
             stars.rotation.z -= 0.0001;
-            
             renderer.render(scene, camera);
         }
 
         init();
+        
+        // --- IMPROVED Glitch Scroll Animation ---
+        const navLinks = document.querySelectorAll('header nav a, #mobile-menu a, .cyber-button[href^="#"]');
+        const glitchOverlay = document.createElement('div');
+        glitchOverlay.id = 'glitch-overlay';
+        document.body.appendChild(glitchOverlay);
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    glitchOverlay.classList.add('active');
+                    
+                    setTimeout(() => {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+
+                    setTimeout(() => {
+                        glitchOverlay.classList.remove('active');
+                    }, 600); 
+                }
+            });
+        });
     </script>
 </body>
 </html>
-
-
-
-
 
